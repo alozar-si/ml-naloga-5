@@ -50,3 +50,75 @@ class ModelCT(nn.Module):
             if is_prob:
                 outputs = torch.sigmoid(outputs)
         return outputs
+
+class SimpleModel(nn.Module):
+    def __init__(self):
+        super(SimpleModel, self).__init__()
+        self.conv1 = nn.Conv2d(1, 4, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        self.bn1 = nn.BatchNorm2d(4)
+        self.fc1 = nn.Linear(65536, 1000)
+        self.fc2 = nn.Linear(1000, 1)
+            
+    def forward(self, x):
+        x = F.max_pool2d(F.relu(self.bn1(self.conv1(x))), 2)
+        x = x.view(-1, self.num_flat_feauters(x))
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+    
+    
+    def train_update(self, train_tensor_tuple, criterion):
+        xb, yb = batch_to_cpu(train_tensor_tuple) 
+
+        outputs = self.forward(xb)
+        loss = criterion(outputs, yb) 
+        
+        return loss
+    
+    
+    def predict(self, item, is_prob = False):
+        xb, _ = item 
+           
+        xb = xb.cpu()        
+        with torch.no_grad():
+            outputs = self.forward(xb)
+            if is_prob:
+                outputs = torch.sigmoid(outputs)
+        return outputs
+
+class CNN_model(nn.Module):
+    def __init__(self):
+        super(SimpleModel, self).__init__()
+        self.conv1 = nn.Conv2d(1, 4, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        self.conv2 = nn.Conv2d(4, 32, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        self.conv2 = nn.Conv2d(32, 128, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        self.bn1 = nn.BatchNorm2d(128)
+        self.fc1 = nn.Linear(65536, 1000) #treba popravit
+        self.fc2 = nn.Linear(1000, 1)
+            
+    def forward(self, x):
+        x = F.max_pool2d(F.relu(self.bn1(self.conv1(x))), 2)
+        x = x.view(-1, self.num_flat_feauters(x))
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+    
+    
+    def train_update(self, train_tensor_tuple, criterion):
+        xb, yb = batch_to_cpu(train_tensor_tuple) 
+
+        outputs = self.forward(xb)
+        loss = criterion(outputs, yb) 
+        
+        return loss
+    
+    
+    def predict(self, item, is_prob = False):
+        xb, _ = item 
+           
+        xb = xb.cpu()        
+        with torch.no_grad():
+            outputs = self.forward(xb)
+            if is_prob:
+                outputs = torch.sigmoid(outputs)
+        return outputs
