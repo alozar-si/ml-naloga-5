@@ -7,6 +7,9 @@ import torch.nn.functional as F
 def batch_to_cpu(item):
     return (i.cpu() for i in item)
 
+def batch_to_gpu(item):
+    return (i.gpu() for i in item)
+
 class ModelCT(nn.Module):
     def __init__(self):
         super(ModelCT, self).__init__()
@@ -60,7 +63,11 @@ class SimpleModel(nn.Module):
         self.fc2 = nn.Linear(1000, 1)
             
     def forward(self, x):
-        x = F.max_pool2d(F.relu(self.bn1(self.conv1(x))), 2)
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, (2,2))
+        #print(x.)
         x = x.view(-1, self.num_flat_feauters(x))
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
@@ -85,8 +92,16 @@ class SimpleModel(nn.Module):
             if is_prob:
                 outputs = torch.sigmoid(outputs)
         return outputs
+        
+        
+    def num_flat_feauters(self, x):
+        size = x.size()[1:]
+        num_features = 1
+        for s in size:
+            num_features *= s
+        return num_features
 
-class CNN_model(nn.Module):
+"""class SimpleModel(nn.Module):
     def __init__(self):
         super(SimpleModel, self).__init__()
         self.conv1 = nn.Conv2d(1, 4, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
@@ -121,4 +136,4 @@ class CNN_model(nn.Module):
             outputs = self.forward(xb)
             if is_prob:
                 outputs = torch.sigmoid(outputs)
-        return outputs
+        return outputs"""

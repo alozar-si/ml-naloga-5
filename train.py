@@ -22,7 +22,7 @@ class Training():
         os.mkdir(path_to_model)
         
         # 2. Use cudnn as backend for speed up
-        torch.backends.cudnn.benchmark = True
+        #torch.backends.cudnn.benchmark = True # ce laufas CUDA
         
         learning_rate = hyperparameters['learning_rate']
         weight_decay = hyperparameters['weight_decay']
